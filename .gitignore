@@ -1,2 +1,6 @@
 rebar_git/
 serv/
+.rebar/
+ebin/
+
+erl_crash.dump
