@@ -1,7 +1,7 @@
 -module(chatserver).
 -export ([start/0, stop/0]).
 
--define (APPS, [crypto, cowlib, ranch, cowboy, chatserver]).
+-define (APPS, [crypto, cowlib, ranch, cowboy, chatserver, sync]).
 
 start() ->
 	ok = ensure_started(?APPS).
