@@ -1,5 +1,5 @@
 -module(chatserver).
--export ([start/0, stop/0]).
+-export ([start/0, stop/0, update_routes/0]).
 
 -define (APPS, [crypto, cowlib, ranch, gproc, cowboy, chatserver, sync]).
 
@@ -20,3 +20,7 @@ ensure_stoped([]) -> ok;
 ensure_stoped([App | Apps]) ->
     application:stop(App),
     ensure_stoped(Apps).
+
+update_routes() ->
+	Routes = chatserver_app:dispatch_rules(),
+	cowboy:set_env(http_listener, dispatch, Routes).
