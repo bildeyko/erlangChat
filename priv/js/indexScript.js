@@ -15,15 +15,13 @@ function connect() {
 	websocket.onerror = function(evt) { onError(evt) }; 
 };
 
-function sendText() {
-	if(websocket.readyState == websocket.OPEN){
-		text = document.getElementById('usermsg').value;
-		websocket.send(text);
-		console.log("Sending: " + text);
-	} else {
+function checkConnection() {
+	if(websocket.readyState == websocket.OPEN)
+		return true;
+	else 
 		console.log("Websocket is not connected");
-	};
-};
+	return false;
+}
 
 function onOpen(evt) {
 	console.log("Connection opened.");
@@ -31,12 +29,33 @@ function onOpen(evt) {
 
 function onClose(evt) {
 	console.log("Connection closed.");
+	setTimeout(connect, 1000);
 };
 
 function onMessage(evt) {
 	console.log("Message: " + evt.data);
-}
+};
 
 function onError(evt) {
 	console.log("Error: " + evt.data);
+};
+
+function sendText() {
+	var msg = {
+		type: "msg",
+		msg: $("#usermsg").val(),
+		token: "someToken1234"
+	}
+	if(checkConnection())
+		websocket.send(JSON.stringify(msg));
+};
+
+function signIn() {
+	var msg = {
+		type: "auth",
+		login: $("#userlogin").val(),
+		pass: $("#userpass").val()
+	}
+	if(checkConnection())
+		websocket.send(JSON.stringify(msg));
 }
