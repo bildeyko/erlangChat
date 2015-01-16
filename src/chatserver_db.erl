@@ -2,7 +2,8 @@
 -behaviour (gen_server).
 
 %% API
--export ([start_link/0, insert_user/3]).
+-export ([start_link/0]).
+-export ([insert_user/3]).
 
 %% gen_server
 -export ([init/1]).

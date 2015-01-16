@@ -15,7 +15,8 @@ websocket_handle({text, Msg}, Req, State) ->
 			gproc:send({p, l, ?MainRoomKey}, {self(), ?MainRoomKey, Msg}),
 			List = jsx:decode(Msg, [{labels, atom}]),
 			StrList = chatserver_converter:json_bin_to_str(List),
-			message_handler(StrList);
+			Res = message_handler(StrList),
+			self() ! {response, Res};
 		false ->
 			io:format("Msg isn't json~n")
 	end,	
@@ -29,14 +30,25 @@ message_handler([{type, "msg"}, {msg, Msg}, {token, Token}]) ->
 	io:format("It's a mes request~n");
 message_handler([{type, "reg"}, {login, Login}, {pass, Pass}]) ->
 	io:format("It's a reg request~n"),
-	chatserver_db:insert_user(Login, Pass, "abhd739");
+	Salt = chatserver_crypto:get_salt(),
+	CryptoPass = chatserver_crypto:get_MD5pass(Pass, Salt),
+	case chatserver_db:insert_user(Login, CryptoPass, Salt) of
+		{ok, _} ->
+			Token = chatserver_crypto:get_MD5pass(chatserver_crypto:get_salt(), []),
+			chatserver_auth:insert_user(Login, Token),
+			io:format("Send~n"),
+			[{type, "reg"}, {status, "success"}, {token, Token}];			
+		{error, _} ->
+			io:format("error~n"),
+			[{type, "reg"}, {status, "error"}, {reason, "This login is already in use"}]
+	end;
 message_handler(_) ->
 	io:format("Undefined type of message~n").
 
-websocket_info({timeout, _Ref, Msg}, Req, State) ->
-	erlang:start_timer(1000, self(), <<"How' you doin'?">>),
-	{reply, {text, Msg}, Req, State};
-websocket_info({_Pid, ?MainRoomKey, Msg}, Req, State) ->
+websocket_info({response, Data}, Req, State) ->
+	io:format("Ok~n"),
+	BinData = chatserver_converter:json_str_to_bin(Data),
+	Msg = jsx:encode(BinData),
 	{reply, {text, Msg}, Req, State};
 websocket_info(_Info, Req, State) ->
 	{ok, Req, State}.
