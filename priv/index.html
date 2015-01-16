@@ -7,9 +7,16 @@
 	</head>
 	<body>
 		<div id="authPanel">
-			<input name="userlogin" type="text" id="userlogin" size="20" />
-			<input name="userpass" type="text" id="userpass" size="20" />
+			<p>Auth</p>
+			<input name="userlogin" type="text" id="authlogin" size="20" />
+			<input name="userpass" type="text" id="authpass" size="20" />
 			<button type="button"  id="submitmsg" onclick="signIn()">Sign in</button>
+		</div>
+		<div id="regPanel">
+			<p>Registration</p>
+			<input name="userlogin" type="text" id="reglogin" size="20" />
+			<input name="userpass" type="text" id="regpass" size="20" />
+			<button type="button"  id="submitmsg" onclick="signUp()">Sign up</button>
 		</div>
 		<div id="wrapper">
 			<div id="chatbox"></div>

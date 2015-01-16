@@ -53,8 +53,18 @@ function sendText() {
 function signIn() {
 	var msg = {
 		type: "auth",
-		login: $("#userlogin").val(),
-		pass: $("#userpass").val()
+		login: $("#authlogin").val(),
+		pass: $("#authpass").val()
+	}
+	if(checkConnection())
+		websocket.send(JSON.stringify(msg));
+}
+
+function signUp() {
+	var msg = {
+		type: "reg",
+		login: $("#reglogin").val(),
+		pass: $("#regpass").val()
 	}
 	if(checkConnection())
 		websocket.send(JSON.stringify(msg));

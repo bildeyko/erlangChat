@@ -26,7 +26,10 @@ websocket_handle(_Data, Req, State) ->
 message_handler([{type, "auth"}, {login, Login}, {pass, Pass}]) ->
 	io:format("It's an auth request~n");
 message_handler([{type, "msg"}, {msg, Msg}, {token, Token}]) ->
-	io:format("It's an mes request~n");
+	io:format("It's a mes request~n");
+message_handler([{type, "reg"}, {login, Login}, {pass, Pass}]) ->
+	io:format("It's a reg request~n"),
+	chatserver_db:insert_user(Login, Pass, "abhd739");
 message_handler(_) ->
 	io:format("Undefined type of message~n").
 
