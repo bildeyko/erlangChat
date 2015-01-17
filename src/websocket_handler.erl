@@ -25,7 +25,20 @@ websocket_handle(_Data, Req, State) ->
 	{ok, Req, State}.
 
 message_handler([{type, "auth"}, {login, Login}, {pass, Pass}]) ->
-	io:format("It's an auth request~n");
+	io:format("It's an auth request~n"),
+	case chatserver_db:get_user(Login) of
+		{ok, [{pass, DbPass}, {salt, Salt}]} ->
+			CryptoPass = chatserver_crypto:get_MD5pass(Pass, Salt),
+			if CryptoPass == DbPass -> 
+				Token = chatserver_crypto:get_MD5pass(chatserver_crypto:get_salt(), []),
+				chatserver_auth:insert_user(Login, Token),
+				[{type, "auth"}, {status, "success"}, {token, Token}];
+				true ->
+					[{type, "auth"}, {status, "error"}, {reason, "Login or pass is wrong"}]
+			end;
+		{not_found, []} ->
+			[{type, "auth"}, {status, "error"}, {reason, "Login or pass is wrong"}]
+	end;	
 message_handler([{type, "msg"}, {msg, Msg}, {token, Token}]) ->
 	io:format("It's a mes request~n");
 message_handler([{type, "reg"}, {login, Login}, {pass, Pass}]) ->
@@ -46,7 +59,6 @@ message_handler(_) ->
 	io:format("Undefined type of message~n").
 
 websocket_info({response, Data}, Req, State) ->
-	io:format("Ok~n"),
 	BinData = chatserver_converter:json_str_to_bin(Data),
 	Msg = jsx:encode(BinData),
 	{reply, {text, Msg}, Req, State};

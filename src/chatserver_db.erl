@@ -4,6 +4,7 @@
 %% API
 -export ([start_link/0]).
 -export ([insert_user/3]).
+-export ([get_user/1]).
 
 %% gen_server
 -export ([init/1]).
@@ -20,6 +21,9 @@ start_link() ->
 insert_user(Login, Pass, Salt) ->
 	gen_server:call({global, ?MODULE}, {insert_user, Login, Pass, Salt}).
 
+get_user(Login) ->
+	gen_server:call({global, ?MODULE}, {select_user, Login}).
+
 %% gen_server
 init([]) ->
 	[Host, User, Password, Database, Port] = ["127.0.0.1", "chat_admin", "1234", "chat_database", 5432],
@@ -27,8 +31,19 @@ init([]) ->
 	{ok, C}.
 
 handle_call({insert_user, Login, Pass, Salt}, _From, C) ->
-	Res = pgsql:equery(C, "INSERT INTO users (login, pass, salt) VALUES ($1, $2, $3)", [Login, Pass, Salt]),
-	{reply, Res, C}.
+	ResDB = pgsql:equery(C, "INSERT INTO users (login, pass, salt) VALUES ($1, $2, $3)", [Login, Pass, Salt]),
+	{reply, ResDB, C};
+handle_call({select_user, Login}, _From, C) ->
+	ResDB = pgsql:equery(C, "SELECT pass, salt FROM users WHERE login = $1", [Login]),
+	case ResDB of 
+		{ok, Cols, [Row|_]} ->
+			ListKeys = [binary_to_atom(Key, utf8) || {_,Key,_,_,_,_} <- Cols],
+			ListValues = [if is_binary(Value) -> erlang:binary_to_list(Value); true -> Value end || Value <- tuple_to_list(Row)],
+			Res = lists:zip(ListKeys, ListValues),
+			{reply, {ok, Res}, C};
+		{ok, _Cols, []} ->
+			{reply, {not_found, []}, C}
+	end.
 
 code_change(_OldVsn, State, _Extra) ->
 	{ok, State}.
