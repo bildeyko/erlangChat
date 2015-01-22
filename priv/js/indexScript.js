@@ -1,4 +1,5 @@
 var websocket;
+var token;
 window.onload = function () {
 	init();
 }
@@ -34,17 +35,53 @@ function onClose(evt) {
 
 function onMessage(evt) {
 	console.log("Message: " + evt.data);
+	var resp = JSON.parse(evt.data);
+	console.log("Message type: " + resp.type);
+	switch (resp.type) {
+		case "auth":
+			authMsg_handler(resp);
+			break;
+		case "reg":
+			regMsg_handler(resp);
+			break;
+		case "msg":
+			msgMsg_handler(resp);
+			break;
+		case "new_msg":
+			new_msgMsg_handler(resp);
+			break;
+		default:
+			console.log("Unknown json format.");
+	};
 };
 
 function onError(evt) {
 	console.log("Error: " + evt.data);
 };
 
+function authMsg_handler(msg) {
+	token = msg.token;
+	console.log("Token: " + token);
+}
+
+function regMsg_handler(msg) {
+	token = msg.token;
+	console.log("Token: " + token);
+}
+
+function msgMsg_handler(msg) {
+	console.log("Msg status: " + msg.status);
+}
+
+function new_msgMsg_handler(msg) {
+	console.log("New msg from " + msg.login + " : " + msg.msg);
+}
+
 function sendText() {
 	var msg = {
 		type: "msg",
 		msg: $("#usermsg").val(),
-		token: "someToken1234"
+		token: token
 	}
 	if(checkConnection())
 		websocket.send(JSON.stringify(msg));

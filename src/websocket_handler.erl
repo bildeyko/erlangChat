@@ -31,7 +31,7 @@ message_handler([{type, "auth"}, {login, Login}, {pass, Pass}]) ->
 			CryptoPass = chatserver_crypto:get_MD5pass(Pass, Salt),
 			if CryptoPass == DbPass -> 
 				Token = chatserver_crypto:get_MD5pass(chatserver_crypto:get_salt(), []),
-				chatserver_auth:insert_user(Login, Token),
+				chatserver_auth:insert_user(Token, Login),
 				[{type, "auth"}, {status, "success"}, {token, Token}];
 				true ->
 					[{type, "auth"}, {status, "error"}, {reason, "Login or pass is wrong"}]
@@ -40,7 +40,14 @@ message_handler([{type, "auth"}, {login, Login}, {pass, Pass}]) ->
 			[{type, "auth"}, {status, "error"}, {reason, "Login or pass is wrong"}]
 	end;	
 message_handler([{type, "msg"}, {msg, Msg}, {token, Token}]) ->
-	io:format("It's a mes request~n");
+	io:format("It's a mes request~n"),
+	case chatserver_auth:find_user(Token) of
+		{ok, Login} ->
+			gproc:send({p,l, ?MainRoomKey}, {response, [{type, "new_msg"}, {login, Login}, {msg, Msg}]}),
+			[{type, "msg"}, {status, "success"}];
+		{not_found, _} ->
+			[{type, "msg"}, {status, "error"}, {reason, "You are not logged in"}]
+	end;
 message_handler([{type, "reg"}, {login, Login}, {pass, Pass}]) ->
 	io:format("It's a reg request~n"),
 	Salt = chatserver_crypto:get_salt(),
@@ -48,7 +55,7 @@ message_handler([{type, "reg"}, {login, Login}, {pass, Pass}]) ->
 	case chatserver_db:insert_user(Login, CryptoPass, Salt) of
 		{ok, _} ->
 			Token = chatserver_crypto:get_MD5pass(chatserver_crypto:get_salt(), []),
-			chatserver_auth:insert_user(Login, Token),
+			chatserver_auth:insert_user(Token, Login),
 			io:format("Send~n"),
 			[{type, "reg"}, {status, "success"}, {token, Token}];			
 		{error, _} ->
