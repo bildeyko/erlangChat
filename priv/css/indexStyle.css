@@ -1,0 +1,155 @@
+#content {
+	top: 50%;
+	left: 50%;
+	height: 550px;
+	width: 450px;
+	position: absolute;
+	margin: -275px 0 0 -225px;
+	background: #EEEEEE;
+	border-radius: 5px;
+}
+
+input[type="text"], [type="password"] {
+	padding: 10px;
+	font-family: sans-serif;
+	font-size: 18px;
+	appearance: none;
+	box-shadow: none;
+	border-radius: none;
+	border: solid 1px #dcdcdc;
+}
+
+input[type="text"], [type="password"]:focus {
+	outline: none;
+}
+
+input[type="submit"] {
+	padding: 10px;
+	font-family: sans-serif;
+	font-size: 18px;
+	appearance: none;
+	box-shadow: none;
+	border-radius: none;
+	border: solid 1px #dcdcdc;
+	background-color: #DDDDDD; 
+	transition: box-shadow 0.3s, border 0.3s;
+}
+
+input[type="submit"]:hover, [type="submit"]:focus {
+	outline: none;
+	border: solid 1px #44C0C7;
+	box-shadow: 0 0 1px 1px #44C0C7;
+}
+
+/*
+	Auth component
+*/
+
+.inputLine {
+	display: block;
+	margin-bottom: 8px;
+}
+
+.authForm {
+	width: 250px;
+	height: 200px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -100px 0 0 -125px;
+	text-align: center;
+}
+
+/*
+	ChatBox component
+*/
+
+.chatBox {
+	display: block;
+	padding: 10px;
+}
+
+.chatBox div{
+	margin-bottom: 8px;
+}
+
+.chatHeader {
+	clear:both; 
+	text-align:right;
+	height: 50px;
+}
+
+.chatHeader h3 {
+	display: inline;
+	float: left;
+	line-height:15px;
+}
+
+/*.chatHeader div h3{
+	display: inline;
+}*/
+
+/* It's a bad way, because I already have same style for input submit.  */
+.chatHeader button {
+	display: inline;
+	padding: 10px;
+	font-family: sans-serif;
+	font-size: 18px;
+	appearance: none;
+	box-shadow: none;
+	border-radius: none;
+	border: solid 1px #dcdcdc;
+	background-color: #DDDDDD; 
+	transition: box-shadow 0.3s, border 0.3s;
+}
+.chatHeader button:hover, button:focus {
+	outline: none;
+	border: solid 1px #44C0C7;
+	box-shadow: 0 0 1px 1px #44C0C7;
+}
+
+/*
+	MsgList component
+*/
+
+.msgList {
+	height: 400px;
+	overflow: auto;
+	background: #fff;
+	border: solid 1px #dcdcdc;
+}
+
+/*
+	MsgForm component
+*/
+
+#msgFormText {
+	display: block;
+	width: 70%;
+	float: left;
+	margin-right: 10%;
+}
+#msgFormBut {
+	display: block;
+	width: 20%;
+}
+
+/*
+	Message component
+*/
+
+.message {
+	padding-left: 5px;
+	padding-right: 5px;
+	/*border: solid 1px #dcdcdc;*/
+}
+
+.message p {
+	/*border: solid 1px #dcdcdc;*/
+	margin: 0;
+}
+
+.messageAuthor {
+	color: #525050;
+	font-weight: bold;
+}

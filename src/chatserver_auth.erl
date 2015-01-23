@@ -5,6 +5,8 @@
 -export ([start_link/0]).
 -export ([insert_user/2]).
 -export ([find_user/1]).
+-export ([delete_user/1]).
+-export ([show_dict/0]).
 
 %% gen_server
 -export ([init/1]).
@@ -20,6 +22,12 @@ insert_user(Token, Login) ->
 find_user(Token) ->
 	gen_server:call({global, ?MODULE}, {find_user, Token}).
 
+delete_user(Token) ->
+	gen_server:call({global, ?MODULE}, {delete_user, Token}).
+
+show_dict() ->
+	gen_server:call({global, ?MODULE}, show_dict).
+
 %% gen_server
 init([]) ->
 	Auths = orddict:new(),
@@ -34,5 +42,17 @@ handle_call({find_user, Key}, _From, Auths) ->
 			{reply, {ok, Value}, Auths};
 		error ->
 			{reply, {not_found, []}, Auths}
-	end.
-	
+	end;
+handle_call({delete_user, Key}, _From, Auths) ->
+	case orddict:find(Key, Auths) of 
+		{ok, Value} ->
+			NewAuths = orddict:erase(Key, Auths),
+			{reply, ok, NewAuths};
+		error ->
+			{reply, not_found, Auths}
+	end;
+handle_call(show_dict, _From, Auths) ->
+	List = orddict:to_list(Auths),
+	io:format("Auth users: ~n~p~n", [List]),
+	{reply, ok, Auths}.
+
