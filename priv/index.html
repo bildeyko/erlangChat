@@ -1,29 +1,15 @@
 <html>
 	<head>
 		<title>ErlChat</title>
-		<script src="js/jquery-2.1.3.min.js"></script>
-		<script src="js/indexScript.js"></script>
 		<link rel="stylesheet" href="css/indexStyle.css" type="text/css">
+		<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+		<script src="http://fb.me/react-0.12.2.js"></script>
+    	<script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
+		<script src="js/jquery-2.1.3.min.js"></script>
+		<script src="js/react-bootstrap.min.js"></script>
 	</head>
 	<body>
-		<div id="authPanel">
-			<p>Auth</p>
-			<input name="userlogin" type="text" id="authlogin" size="20" />
-			<input name="userpass" type="text" id="authpass" size="20" />
-			<button type="button"  id="submitmsg" onclick="signIn()">Sign in</button>
-		</div>
-		<div id="regPanel">
-			<p>Registration</p>
-			<input name="userlogin" type="text" id="reglogin" size="20" />
-			<input name="userpass" type="text" id="regpass" size="20" />
-			<button type="button"  id="submitmsg" onclick="signUp()">Sign up</button>
-		</div>
-		<div id="wrapper">
-			<div id="chatbox"></div>
-			<div id="message">
-				<input name="usermsg" type="text" id="usermsg" size="63" />
-			 	<button type="button"  id="submitmsg" onclick="sendText()">Send</button>
-			</div>
-		</div>
+		<div id="content"></div>
+		<script type="text/jsx;harmony=true" src="js/indexScript.js"></script>
 	</body>
 </html>
