@@ -32,7 +32,7 @@ message_handler([{type, "auth"}, {login, Login}, {pass, Pass}]) ->
 			if CryptoPass == DbPass -> 
 				Token = chatserver_crypto:get_MD5pass(chatserver_crypto:get_salt(), []),
 				chatserver_auth:insert_user(Token, Login),
-				[{type, "auth"}, {status, "success"}, {token, Token}];
+				[{type, "auth"}, {status, "success"}, {login, Login}, {token, Token}];
 				true ->
 					[{type, "auth"}, {status, "error"}, {reason, "Login or pass is wrong"}]
 			end;
