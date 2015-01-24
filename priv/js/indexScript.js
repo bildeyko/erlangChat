@@ -177,10 +177,16 @@ var ChatBox = React.createClass({
 var MsgList = React.createClass({
 	componentWillUpdate: function() {
 		var node = this.getDOMNode();
-		this.shouldScrollBottom = node.scrollTop + node.offsetHeight === node.scrollHeight;
+		console.log("1. " + (node.scrollTop + node.offsetHeight));
+		console.log("2. " + node.scrollHeight);
+		this.shouldScrollBottom = node.scrollTop + node.offsetHeight >= node.scrollHeight;
+		console.log("3. " + this.shouldScrollBottom);
+		console.log("componentWillUpdate");
 	},
 	componentDidUpdate: function() {
+		console.log("componentDidUpdate " + this.shouldScrollBottom);
 		if (this.shouldScrollBottom) {
+			console.log("TRUE - componentDidUpdate");
 			var node = this.getDOMNode();
 			node.scrollTop = node.scrollHeight;
 		}
@@ -201,7 +207,6 @@ var MsgList = React.createClass({
 
 var Message = React.createClass({
 	render: function() {
-		console.log("Text: "+this.props.text);
 		return (
 			<div className="message">
 				<p className="messageAuthor">
@@ -310,7 +315,8 @@ function init() {
 };
 
 function connect() {
-	websocket = new WebSocket("ws://localhost:8081/websocket");
+	//websocket = new WebSocket("ws://localhost:8081/websocket");
+	websocket = new WebSocket("ws://127.0.0.1:8081/websocket");
 	websocket.onopen = function(evt) { onOpen(evt) }; 
 	websocket.onclose = function(evt) { onClose(evt) }; 
 	//websocket.onmessage = function(evt) { onMessage(evt) }; 
