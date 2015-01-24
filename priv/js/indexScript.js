@@ -53,7 +53,8 @@ var ContentBox = React.createClass({
 	},
 	handleSignOutSubmit:function() {
 		websocket.onmessage = this.onMessage;
-		this.setAuthForm();
+		window.location.href = "#/auth";
+		//this.setAuthForm();
 	},
 	handleAlert: function(text) {
 		this.setState({shouldShowError: true, errorText: text});
@@ -326,7 +327,7 @@ function init() {
 };
 
 function connect() {
-	//websocket = new WebSocket("ws://localhost:8081/websocket");
+	//websocket = new WebSocket("ws://78.47.164.68:8081/websocket");
 	websocket = new WebSocket("ws://127.0.0.1:8081/websocket");
 	websocket.onopen = function(evt) { onOpen(evt) }; 
 	websocket.onclose = function(evt) { onClose(evt) }; 
