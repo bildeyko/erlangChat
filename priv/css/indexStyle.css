@@ -122,6 +122,9 @@ input[type="submit"]:hover, [type="submit"]:focus {
 /*
 	MsgForm component
 */
+.msgForm {
+	autocomplete: off;
+}
 
 #msgFormText {
 	display: block;
