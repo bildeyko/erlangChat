@@ -9,6 +9,26 @@
 	border-radius: 5px;
 }
 
+.alertBlock {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	background: #F5D5D5;
+	min-width: 100px;
+	max-width: 225px;
+	border-radius: 5px;
+}
+
+.alertBlock p {
+	margin-left: 5px; 
+	margin-right: 5px;
+	margin-top:5px;
+}
+
+p {
+	color: #525050;
+}
+
 input[type="text"], [type="password"] {
 	padding: 10px;
 	font-family: sans-serif;
@@ -17,6 +37,7 @@ input[type="text"], [type="password"] {
 	box-shadow: none;
 	border-radius: none;
 	border: solid 1px #dcdcdc;
+	color: #525050;
 }
 
 input[type="text"], [type="password"]:focus {
@@ -32,6 +53,7 @@ input[type="submit"] {
 	border-radius: none;
 	border: solid 1px #dcdcdc;
 	background-color: #DDDDDD; 
+	color: #525050;
 	transition: box-shadow 0.3s, border 0.3s;
 }
 

@@ -1,4 +1,3 @@
-var Input = ReactBootstrap.Input;
 var websocket;
 var token;
 init();
@@ -19,7 +18,7 @@ var ContentBox = React.createClass({
 		router.init();
 	},
 	render: function() {
-		var partial;
+		var partial, errorBlock;
 		if (this.state.currentPage === 'auth') {
 			partial = <AuthForm onSignInSubmit={this.handleSignInSubmit} />;
 		} else
@@ -27,10 +26,18 @@ var ContentBox = React.createClass({
 			partial = <RegForm onSignUpSubmit={this.handleSignUpSubmit} />;
 		} else
 		if (this.state.currentPage === 'chat') {
-			partial = <ChatBox login={this.state.login} token={this.state.token} onSignOutSubmit={this.handleSignOutSubmit} />;
+			partial = <ChatBox login={this.state.login} token={this.state.token} onSignOutSubmit={this.handleSignOutSubmit} 
+						onAlert={this.handleAlert}/>;
 		}
+
+		if(this.state.shouldShowError)
+			errorBlock = <AlertBlock text={this.state.errorText}/>;
+		else 
+			errorBlock = ''
+
 		return (
 			<div className="contentBox" id="contentBox">
+				{errorBlock}
 				{partial}
 			</div>
 		);
@@ -39,18 +46,19 @@ var ContentBox = React.createClass({
 	Components' handlers
 	*/
 	handleSignInSubmit: function(user) {
-		console.log(user.login);
 		signIn(user);
 	},
 	handleSignUpSubmit: function(user) {
-		console.log("Registration");
 		signUp(user);
 	},
 	handleSignOutSubmit:function() {
 		websocket.onmessage = this.onMessage;
 		this.setAuthForm();
 	},
-
+	handleAlert: function(text) {
+		this.setState({shouldShowError: true, errorText: text});
+		setTimeout(this.disableAlert, 2000);
+	},
 	/*
 	Sockets' handlers
 	*/
@@ -61,7 +69,7 @@ var ContentBox = React.createClass({
 		this.setState({currentPage: 'auth'});
 	},
 	onMessage: function(evt) {
-		resp = onMessage(evt); 
+		resp = JSON.parse(evt.data); 
 		this.parseResp(resp);
 	},
 	parseResp: function(resp) {
@@ -75,28 +83,30 @@ var ContentBox = React.createClass({
 		};
 	},
 	authMsgHandler: function(msg) {
-		if(msg.status == 'error')
-			showError(msg.reason);
+		if(msg.status == 'error') {
+			this.handleAlert(msg.reason);
+		}
 		else {
 			token = msg.token;
-			console.log("Token: " + token);
 			this.setChatBox(msg.login, msg.token);
 		}
 	},
 	regMsgHandler: function(msg) {
-		if(msg.status == 'error')
-			showError(msg.reason);
+		if(msg.status == 'error') {
+			this.handleAlert(msg.reason);
+		}
 		else {
 			token = msg.token;
-			console.log("Token: " + token);
 			this.setChatBox(msg.login, msg.token);
 		}
+	},
+	disableAlert: function() {
+		$(".alertBlock").fadeOut("slow", this.fadeOutCallback);		
+	},
+	fadeOutCallback:function() {
+		this.setState({shouldShowError: false, errorText: ''});
 	}
 });
-
-function showError(msg) {
-	console.log("Error:" + msg);
-};
 
 var ChatBox = React.createClass({
 	/*
@@ -124,27 +134,24 @@ var ChatBox = React.createClass({
 	Components' handlers
 	*/
 	handleMessageSubmit: function(msg) {
-		console.log("Submit. Msg: " + msg.text);
 		var comments = this.state.data;
 		comments.push(msg);
 		this.setState({data: comments});
 		sendText(msg.text, this.props.token);
 	},
 	handleNewMessage: function(msg) {
-		console.log("NEW Msg: " + msg.text);
 		var comments = this.state.data;
 		comments.push(msg);
 		this.setState({data: comments});
 	},
 	handleSignOutSubmit: function(evt)	{
-		console.log("Sign out");
 		signOut(this.props.token);
 	},
 	/*
 	Sockets' handlers
 	*/
 	onMessage: function(evt) {
-		resp = onMessage(evt); 
+		resp = JSON.parse(evt.data); 
 		this.parseResp(resp);
 	},
 	parseResp: function(resp) {
@@ -165,10 +172,10 @@ var ChatBox = React.createClass({
 			this.handleNewMessage({author: msg.login, text: msg.msg});
 	},
 	signOutMsgHandler:function(msg) {
-		if(msg.status == 'error')
-			showError(msg.reason);
+		if(msg.status == 'error') {
+			this.props.onAlert(msg.reason);
+		}
 		else {
-			console.log("Sign out success");
 			this.props.onSignOutSubmit();
 		}
 	}
@@ -177,16 +184,10 @@ var ChatBox = React.createClass({
 var MsgList = React.createClass({
 	componentWillUpdate: function() {
 		var node = this.getDOMNode();
-		console.log("1. " + (node.scrollTop + node.offsetHeight));
-		console.log("2. " + node.scrollHeight);
 		this.shouldScrollBottom = node.scrollTop + node.offsetHeight >= node.scrollHeight;
-		console.log("3. " + this.shouldScrollBottom);
-		console.log("componentWillUpdate");
 	},
 	componentDidUpdate: function() {
-		console.log("componentDidUpdate " + this.shouldScrollBottom);
 		if (this.shouldScrollBottom) {
-			console.log("TRUE - componentDidUpdate");
 			var node = this.getDOMNode();
 			node.scrollTop = node.scrollHeight;
 		}
@@ -305,6 +306,16 @@ var RegForm = React.createClass({
 	}
 });
 
+var AlertBlock = React.createClass({
+	render: function() {
+		return(
+			<div className="alertBlock">
+				<p>{this.props.text}</p>
+			</div>
+		);
+	},
+});
+
 React.render(
   <ContentBox />,
   document.getElementById('content')
@@ -319,7 +330,6 @@ function connect() {
 	websocket = new WebSocket("ws://127.0.0.1:8081/websocket");
 	websocket.onopen = function(evt) { onOpen(evt) }; 
 	websocket.onclose = function(evt) { onClose(evt) }; 
-	//websocket.onmessage = function(evt) { onMessage(evt) }; 
 	websocket.onerror = function(evt) { onError(evt) }; 
 };
 
@@ -338,29 +348,6 @@ function onOpen(evt) {
 function onClose(evt) {
 	console.log("Connection closed.");
 	setTimeout(connect, 1000);
-};
-
-function onMessage(evt) {
-	console.log("Message: " + evt.data);
-	var resp = JSON.parse(evt.data);
-	console.log("Message type: " + resp.type);
-	/*switch (resp.type) {
-		case "auth":
-			authMsg_handler(resp);
-			break;
-		case "reg":
-			regMsg_handler(resp);
-			break;
-		case "msg":
-			msgMsg_handler(resp);
-			break;
-		case "new_msg":
-			new_msgMsg_handler(resp);
-			break;
-		default:
-			console.log("Unknown json format.");
-	};*/
-	return resp;
 };
 
 function onError(evt) {
@@ -408,6 +395,5 @@ function sendText(msg, token) {
 
 function authMsg_handler(msg) {
 	token = msg.token;
-	console.log("Token: " + token);
 	ContentBox.setChatBox();
 }
