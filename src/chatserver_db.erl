@@ -26,7 +26,33 @@ get_user(Login) ->
 
 %% gen_server
 init([]) ->
-	[Host, User, Password, Database, Port] = ["127.0.0.1", "chat_admin", "1234", "chat_database", 5432],
+	%[Host, User, Password, Database, Port] = ["127.0.0.1", "chat_admin", "1234", "chat_database", 5432],
+	case os:getenv("OPENSHIFT_POSTGRESQL_DB_HOST") of
+		false ->
+			Host = "127.0.0.1";
+		Host ->
+			ok
+	end,
+	case os:getenv("OPENSHIFT_POSTGRESQL_DB_USERNAME") of
+		false ->
+			User = "chat_admin";
+		User ->
+			ok
+	end,
+	case os:getenv("OPENSHIFT_POSTGRESQL_DB_PASSWORD") of
+		false ->
+			Password = "1234";
+		Password ->
+			ok
+	end,
+	case os:getenv("PGDATABASE") of
+		false ->
+			Database = "chat_database";
+		Database ->
+			ok
+	end,
+	Port = 5432,
+	io:format("DB: ~s ~s ~s ~s ~w~n", [Host, User, Password, Database, Port]),
 	{ok, C} = pgsql:connect(Host, User, Password, [{database, Database}, {port, Port}]),
 	{ok, C}.
 
