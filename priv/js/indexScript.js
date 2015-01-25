@@ -54,7 +54,7 @@ var ContentBox = React.createClass({
 	handleSignOutSubmit:function() {
 		websocket.onmessage = this.onMessage;
 		window.location.href = "#/auth";
-		//this.setAuthForm();
+		this.setAuthForm();
 	},
 	handleAlert: function(text) {
 		this.setState({shouldShowError: true, errorText: text});
@@ -67,6 +67,7 @@ var ContentBox = React.createClass({
 		this.setState({currentPage: 'chat', login: login, token: token});
 	},
 	setAuthForm: function() {
+		window.location.href = "#/auth";
 		this.setState({currentPage: 'auth'});
 	},
 	onMessage: function(evt) {
