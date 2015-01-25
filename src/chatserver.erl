@@ -1,5 +1,9 @@
 -module(chatserver).
--export ([start/0, stop/0, update_routes/0]).
+
+%% API
+-export ([start/0]).
+-export ([stop/0]).
+-export ([update_routes/0]).
 
 -define (APPS, [crypto, cowlib, ranch, gproc, cowboy, chatserver, sync]).
 

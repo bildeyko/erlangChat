@@ -1,9 +1,11 @@
 -module(websocket_handler).
 
+
+%% Cowboy websocket skeleton
 -export([init/2]).
+-export([terminate/3]).
 -export ([websocket_handle/3]).
 -export ([websocket_info/3]).
--export([terminate/3]).
 
 -define(MainRoomKey, main_room).
 

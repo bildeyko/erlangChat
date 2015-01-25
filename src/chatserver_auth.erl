@@ -55,4 +55,3 @@ handle_call(show_dict, _From, Auths) ->
 	List = orddict:to_list(Auths),
 	io:format("Auth users: ~n~p~n", [List]),
 	{reply, ok, Auths}.
-

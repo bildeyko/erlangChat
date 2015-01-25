@@ -26,7 +26,6 @@ get_user(Login) ->
 
 %% gen_server
 init([]) ->
-	%[Host, User, Password, Database, Port] = ["127.0.0.1", "chat_admin", "1234", "chat_database", 5432],
 	case os:getenv("OPENSHIFT_POSTGRESQL_DB_HOST") of
 		false ->
 			Host = "127.0.0.1";

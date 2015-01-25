@@ -2,19 +2,15 @@
 -behaviour(application).
 
 %% Application callbacks
--export([start/2, stop/1]).
+-export([start/2]).
+-export ([stop/1]).
 
 %% API
 -export ([dispatch_rules/0]).
 
-%start() ->
-%	application:start(cowboy),
-%	application:start(chatserver).
-
 dispatch_rules() ->
 	cowboy_router:compile([
 		{'_', [
-			%{"/", index_handler, []},
 			{"/", cowboy_static, {file, "priv/index.html"}},
 			{"/websocket", websocket_handler, []},
 			{"/js/[...]", cowboy_static, {dir, "priv/js", 

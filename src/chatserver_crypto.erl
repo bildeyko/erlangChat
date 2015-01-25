@@ -1,5 +1,6 @@
 -module (chatserver_crypto).
 
+%% API
 -export ([get_salt/0]).
 -export ([get_MD5pass/2]).
 
