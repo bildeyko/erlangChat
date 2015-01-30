@@ -87,6 +87,8 @@ message_handler([{type, "usersList"}, {token, Token}]) ->
 	case chatserver_auth:find_user(Token) of
 		{ok, Login} ->
 			List = chatserver_auth:get_users(),
+			% How to create objects in the jsx library? 
+			% Current way is very strange because in the client I must decode string from "list" separately.
 			[{token, Token}, {type, "usersList"}, {status, "success"}, {list, [jsx:encode(List)]}];
 		{not_found, _} ->
 			[{token, []}, {type, "usersList"}, {status, "error"}, {reason, "You are not logged in"}]

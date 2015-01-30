@@ -68,7 +68,8 @@ handle_call(show_dict, _From, Auths) ->
 create_list([], Logins) ->
 	Logins;
 create_list([{_, Login}|T], Logins) ->
-	% hd(Login) because Login is a list with some values.
-	% But this Auths contains KEY and one value. 
+	% 1.hd(Login) because Login is a list with some values.
+	% 		But this Auths contains KEY and one value. 
+	% 2.Here data is binary! It's for normal working of jsx library.
 	create_list(T, [list_to_binary(hd(Login))|Logins]).
 	

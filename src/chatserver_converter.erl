@@ -21,6 +21,7 @@ bin_to_str([H|L], NewList) ->
 	StrData = erlang:binary_to_list(Data),
 	bin_to_str(L, lists:append(NewList, [{Label, StrData}])).
 
+% This function has bad style. Should rewrite it.
 str_to_bin([], NewList) ->
 	NewList;
 str_to_bin([{Label, Data}|L], NewList) when not(is_binary(Data)) ->
@@ -33,7 +34,7 @@ str_to_bin([{Label, Data}|L], NewList) when not(is_binary(Data)) ->
 	str_to_bin(L, lists:append(NewList, [{Label, BinData}]));
 str_to_bin([{Label, Data}|L], NewList) when is_binary(Data) ->
 	str_to_bin(L, lists:append(NewList, [{Label, Data}]));
-str_to_bin([List|L], NewList) -> %% Править тут
+str_to_bin([List|L], NewList) ->
 	%BinData = json_listStr_to_bin(Obj),
 	%BinData = list_to_binary(Obj),
 	%str_to_bin(L, lists:append(NewList, [[{Label, BinData}]])).
