@@ -2,27 +2,11 @@
 	top: 50%;
 	left: 50%;
 	height: 550px;
-	width: 450px;
+	width: 500px;
 	position: absolute;
-	margin: -275px 0 0 -225px;
+	margin: -275px 0 0 -250px;
 	background: #EEEEEE;
 	border-radius: 5px;
-}
-
-.alertBlock {
-	position: absolute;
-	top: 3px;
-	left: 3px;
-	background: #F5D5D5;
-	min-width: 100px;
-	max-width: 225px;
-	border-radius: 5px;
-}
-
-.alertBlock p {
-	margin-left: 5px; 
-	margin-right: 5px;
-	margin-top:5px;
 }
 
 p {
@@ -90,6 +74,10 @@ input[type="submit"]:hover, [type="submit"]:focus {
 	display: block;
 	padding: 10px;
 }
+.wrapperListForm{
+	float:left;
+	width: 70%;
+}
 
 .chatBox div{
 	margin-bottom: 8px;
@@ -105,6 +93,7 @@ input[type="submit"]:hover, [type="submit"]:focus {
 	display: inline;
 	float: left;
 	line-height:15px;
+	color: #525050;
 }
 
 /*.chatHeader div h3{
@@ -130,6 +119,18 @@ input[type="submit"]:hover, [type="submit"]:focus {
 	box-shadow: 0 0 1px 1px #44C0C7;
 }
 
+.onlineUsers {
+	float: right;
+	width: 30%;
+	height: 400px;
+	padding-left: 5px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.onlineUser h4 {
+	color: #525050;
+}
 /*
 	MsgList component
 */
@@ -144,7 +145,7 @@ input[type="submit"]:hover, [type="submit"]:focus {
 /*
 	MsgForm component
 */
-.msgForm {
+.msgForm form {
 	autocomplete: off;
 }
 
@@ -177,4 +178,24 @@ input[type="submit"]:hover, [type="submit"]:focus {
 .messageAuthor {
 	color: #525050;
 	font-weight: bold;
+}
+
+/*
+	AlertBlock component
+*/
+
+.alertBlock {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	background: #F5D5D5;
+	min-width: 100px;
+	max-width: 225px;
+	border-radius: 5px;
+}
+
+.alertBlock p {
+	margin-left: 5px; 
+	margin-right: 5px;
+	margin-top:5px;
 }

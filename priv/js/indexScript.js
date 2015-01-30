@@ -128,12 +128,16 @@ var ChatBox = React.createClass({
 		return (
 			<div className="chatBox">
 			<div className="chatHeader">
-				<h3>Hello, {this.props.login}</h3>
-				<button onClick={this.handleSignOutSubmit}>Sign out</button>
+					<h3>Hello, {this.props.login}</h3>
+					<button onClick={this.handleSignOutSubmit}>Sign out</button>
 			</div>
-			<MsgList data={this.state.data} />
-			<MsgForm onMessageSubmit={this.handleMessageSubmit} login={this.props.login}/>
-			{usersBlock}
+			<div className="wrapper">
+				<div className="wrapperListForm">
+					<MsgList data={this.state.data} />
+					<MsgForm onMessageSubmit={this.handleMessageSubmit} login={this.props.login}/>
+				</div>
+				{usersBlock}
+			</div>
 			</div>
 		);
   	},
@@ -159,7 +163,6 @@ var ChatBox = React.createClass({
 	*/
 	onMessage: function(evt) {
 		resp = JSON.parse(evt.data); 
-		console.log(resp);
 		this.parseResp(resp);
 	},
 	parseResp: function(resp) {
@@ -203,13 +206,11 @@ var ChatBox = React.createClass({
 		else {
 			arr = JSON.parse(resp.list[0]);
 			arr.sort();
-			console.log(arr);
 			this.shouldOnlineUsers = true;
 			this.setState({users: arr});
 		}
 	},
 	newUserMsgHandler:function(msg) {
-		console.log("New user");
 		var newArray;
 		newArray = this.state.users;;
 		newArray.push(msg.login);
@@ -218,7 +219,6 @@ var ChatBox = React.createClass({
 	},
 	delUserMsgHandler:function(msg) {
 		var index, newArray;
-		console.log("Del user");
 		newArray = this.state.users;
 		index = newArray.indexOf(msg.login);
 		if (index > -1) {
@@ -360,9 +360,10 @@ var OnlineUsers = React.createClass({
 				<OnlineUser login={login} key={login}/>
 			);
 		});
+		var count = this.props.users.length;
 		return(
 			<div className="onlineUsers">
-				<p>Online: 3</p>
+				<p>Online users: {count}</p>
 				{userNodes}
 			</div>
 		);
@@ -373,7 +374,7 @@ var OnlineUser = React.createClass({
 	render: function() {
 		return(
 			<div className="onlineUser">
-				<h3>{this.props.login}</h3>
+				<h4>{this.props.login}</h4>
 			</div>
 		);
 	},
@@ -475,7 +476,6 @@ function getUsersList(token) {
 	var msg = {
 		type: "usersList",
 		token: token,
-		//arr: ["a","b","c"]
 	};
 	if(checkConnection())
 		websocket.send(JSON.stringify(msg));
