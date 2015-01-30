@@ -354,6 +354,10 @@ var RegForm = React.createClass({
 });
 
 var OnlineUsers = React.createClass({
+	/*
+		Move here usersListMsgHandler, newUserMsgHandler, delUserMsgHandler from ChatBox. 
+		It will better style of code.
+	*/
 	render: function() {
 		var userNodes = this.props.users.map(function(login) {
 			return (
