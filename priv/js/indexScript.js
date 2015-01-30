@@ -116,11 +116,15 @@ var ChatBox = React.createClass({
 	*/
 	componentDidMount: function(user) {
 		websocket.onmessage = this.onMessage;
+		getUsersList(this.props.token);
 	},
 	getInitialState: function() {
 		return {data: []};
 	},
 	render: function() {
+		var usersBlock;
+		if(this.shouldOnlineUsers)
+			usersBlock = <OnlineUsers users={this.state.users}/>;
 		return (
 			<div className="chatBox">
 			<div className="chatHeader">
@@ -129,6 +133,7 @@ var ChatBox = React.createClass({
 			</div>
 			<MsgList data={this.state.data} />
 			<MsgForm onMessageSubmit={this.handleMessageSubmit} login={this.props.login}/>
+			{usersBlock}
 			</div>
 		);
   	},
@@ -154,6 +159,7 @@ var ChatBox = React.createClass({
 	*/
 	onMessage: function(evt) {
 		resp = JSON.parse(evt.data); 
+		console.log(resp);
 		this.parseResp(resp);
 	},
 	parseResp: function(resp) {
@@ -166,6 +172,15 @@ var ChatBox = React.createClass({
 				break;
 			case "signOut":
 				this.signOutMsgHandler(resp);
+				break;
+			case "usersList":
+				this.usersListMsgHandler(resp);
+				break;
+			case "usersList_new":
+				this.newUserMsgHandler(resp);
+				break;
+			case "usersList_del":
+				this.delUserMsgHandler(resp);
 				break;
 		};
 	},
@@ -180,6 +195,36 @@ var ChatBox = React.createClass({
 		else {
 			this.props.onSignOutSubmit();
 		}
+	},
+	usersListMsgHandler:function(msg) {
+		if(msg.status == 'error') {
+			this.props.onAlert(msg.reason);
+		}
+		else {
+			arr = JSON.parse(resp.list[0]);
+			arr.sort();
+			console.log(arr);
+			this.shouldOnlineUsers = true;
+			this.setState({users: arr});
+		}
+	},
+	newUserMsgHandler:function(msg) {
+		console.log("New user");
+		var newArray;
+		newArray = this.state.users;;
+		newArray.push(msg.login);
+		newArray.sort();
+		this.setState({users: newArray});
+	},
+	delUserMsgHandler:function(msg) {
+		var index, newArray;
+		console.log("Del user");
+		newArray = this.state.users;
+		index = newArray.indexOf(msg.login);
+		if (index > -1) {
+			newArray.splice(index, 1);
+		}
+		this.setState({users: newArray});
 	}
 });
 
@@ -199,7 +244,7 @@ var MsgList = React.createClass({
 			return (
 				<Message author={msg.author} text={msg.text} key={index}/>
 			);
-	    });
+		});
 	    return (
 	      <div className="msgList" id="msgList">
 	        {messageNodes}
@@ -308,6 +353,32 @@ var RegForm = React.createClass({
 	}
 });
 
+var OnlineUsers = React.createClass({
+	render: function() {
+		var userNodes = this.props.users.map(function(login) {
+			return (
+				<OnlineUser login={login} key={login}/>
+			);
+		});
+		return(
+			<div className="onlineUsers">
+				<p>Online: 3</p>
+				{userNodes}
+			</div>
+		);
+	},
+});
+
+var OnlineUser = React.createClass({
+	render: function() {
+		return(
+			<div className="onlineUser">
+				<h3>{this.props.login}</h3>
+			</div>
+		);
+	},
+});
+
 var AlertBlock = React.createClass({
 	render: function() {
 		return(
@@ -371,7 +442,7 @@ function signUp(user) {
 		type: "reg",
 		login: user.login,
 		pass: user.pass,
-	}
+	};
 	if(checkConnection())
 		websocket.send(JSON.stringify(msg));
 };
@@ -379,8 +450,8 @@ function signUp(user) {
 function signOut(token) {
 	var msg = {
 		type: "signOut",
-		token: token,
-	}
+		token: token
+	};
 	if(checkConnection())
 		websocket.send(JSON.stringify(msg));
 };
@@ -390,7 +461,7 @@ function sendText(msg, token) {
 		type: "msg",
 		msg: msg,
 		token: token
-	}
+	};
 	if(checkConnection())
 		websocket.send(JSON.stringify(msg));
 };
@@ -398,4 +469,14 @@ function sendText(msg, token) {
 function authMsg_handler(msg) {
 	token = msg.token;
 	ContentBox.setChatBox();
+}
+
+function getUsersList(token) {
+	var msg = {
+		type: "usersList",
+		token: token,
+		//arr: ["a","b","c"]
+	};
+	if(checkConnection())
+		websocket.send(JSON.stringify(msg));
 }

@@ -6,6 +6,7 @@
 -export ([insert_user/2]).
 -export ([find_user/1]).
 -export ([delete_user/1]).
+-export ([get_users/0]).
 -export ([show_dict/0]).
 
 %% gen_server
@@ -24,6 +25,9 @@ find_user(Token) ->
 
 delete_user(Token) ->
 	gen_server:call({global, ?MODULE}, {delete_user, Token}).
+
+get_users() ->
+	gen_server:call({global, ?MODULE}, get_users).
 
 show_dict() ->
 	gen_server:call({global, ?MODULE}, show_dict).
@@ -51,7 +55,20 @@ handle_call({delete_user, Key}, _From, Auths) ->
 		error ->
 			{reply, not_found, Auths}
 	end;
+handle_call(get_users, _From, Auths) ->
+	List = orddict:to_list(Auths),
+	OnlyLogins = create_list(List, []),
+	{reply, OnlyLogins, Auths};
 handle_call(show_dict, _From, Auths) ->
 	List = orddict:to_list(Auths),
 	io:format("Auth users: ~n~p~n", [List]),
 	{reply, ok, Auths}.
+
+%% private
+create_list([], Logins) ->
+	Logins;
+create_list([{_, Login}|T], Logins) ->
+	% hd(Login) because Login is a list with some values.
+	% But this Auths contains KEY and one value. 
+	create_list(T, [list_to_binary(hd(Login))|Logins]).
+	

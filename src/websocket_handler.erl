@@ -38,6 +38,7 @@ message_handler([{type, "auth"}, {login, Login}, {pass, Pass}]) ->
 			if CryptoPass == DbPass -> 
 				Token = chatserver_crypto:get_MD5pass(chatserver_crypto:get_salt(), []),
 				chatserver_auth:insert_user(Token, Login),
+				sendNewUserMsg(Login),
 				[{token, Token}, {type, "auth"}, {status, "success"}, {login, Login}, {token, Token}];
 				true ->
 					[{token, []}, {type, "auth"}, {status, "error"}, {reason, "Login or pass is wrong"}]
@@ -62,6 +63,7 @@ message_handler([{type, "reg"}, {login, Login}, {pass, Pass}]) ->
 		{ok, _} ->
 			Token = chatserver_crypto:get_MD5pass(chatserver_crypto:get_salt(), []),
 			chatserver_auth:insert_user(Token, Login),
+			sendNewUserMsg(Login),
 			io:format("Send~n"),
 			[{token, Token}, {type, "reg"}, {status, "success"}, {login, Login}, {token, Token}];			
 		{error, _} ->
@@ -70,13 +72,24 @@ message_handler([{type, "reg"}, {login, Login}, {pass, Pass}]) ->
 	end;
 message_handler([{type, "signOut"}, {token, Token}]) ->
 	io:format("Remove user: ~s~n", [Token]),
+	{ok, Login} = chatserver_auth:find_user(Token),
 	case chatserver_auth:delete_user(Token) of 
 		ok ->
 			io:format("Removing success: ~s~n", [Token]),
+			gproc:send({p,l, ?MainRoomKey}, {response, [{type, "usersList_del"}, {login, Login}]}),
 			[{token, Token}, {type, "signOut"}, {status, "success"}];
 		not_found ->
 			io:format("Removing not success: ~s~n", [Token]),
 			[{token, []}, {type, "signOut"}, {status, "error"}, {reason, "You are not logged in"}]
+	end;
+message_handler([{type, "usersList"}, {token, Token}]) ->
+	io:format("It's a usersList request~n"),
+	case chatserver_auth:find_user(Token) of
+		{ok, Login} ->
+			List = chatserver_auth:get_users(),
+			[{token, Token}, {type, "usersList"}, {status, "success"}, {list, [jsx:encode(List)]}];
+		{not_found, _} ->
+			[{token, []}, {type, "usersList"}, {status, "error"}, {reason, "You are not logged in"}]
 	end;
 message_handler(_) ->
 	io:format("Undefined type of message~n").
@@ -93,11 +106,16 @@ terminate(_Reason, _Req, {token, []}) ->
 	ok;
 terminate(_Reason, _Req, {token, Token}) ->
 	io:format("Terminate socket. Remove user: ~s~n", [Token]),
+	{ok, Login} = chatserver_auth:find_user(Token),
 	case chatserver_auth:delete_user(Token) of 
 		ok ->
 			io:format("Removing success: ~s~n", [Token]),
+			gproc:send({p,l, ?MainRoomKey}, {response, [{type, "usersList_del"}, {login, Login}]}),
 			ok;
 		not_found ->
 			io:format("Removing not success: ~s~n", [Token]),
 			ok
 	end.
+
+sendNewUserMsg(Login) ->
+	gproc:send({p,l, ?MainRoomKey}, {response, [{type, "usersList_new"}, {login, Login}]}).
