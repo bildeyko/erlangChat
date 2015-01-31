@@ -364,7 +364,7 @@ var OnlineUsers = React.createClass({
 				<OnlineUser login={login} key={login}/>
 			);
 		});
-		var count = this.props.users.length;
+		var count = getNumberOfUnique(this.props.users);
 		return(
 			<div className="onlineUsers">
 				<p>Online users: {count}</p>
@@ -483,4 +483,13 @@ function getUsersList(token) {
 	};
 	if(checkConnection())
 		websocket.send(JSON.stringify(msg));
+}
+
+
+function getNumberOfUnique(arr) {
+	var counts = {};
+	for (var i = 0; i < arr.length; i++) {
+		counts[arr[i]] = 1 + (counts[arr[i]] || 0);
+	}
+	return Object.keys(counts).length;
 }
